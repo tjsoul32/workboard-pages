@@ -1,0 +1,36 @@
+<template>
+  <div class="buttoms">
+    <el-button @click="selectText(1)">default</el-button>
+    <el-button @click="selectText(2)">info</el-button>
+    <el-button @click="selectText(3)">success</el-button>
+    <el-button @click="selectText(4)">warning</el-button>
+  </div>
+</template>
+
+<script>
+
+export default {
+  name: 'buttoms',
+  data () {
+    return {
+    }
+  },
+  computed: {
+  },
+  methods: {
+    selectText: function (tp) {
+      let selecter = window.getSelection()
+      let selectStr = selecter.toString()
+      let newText = selectStr.trim() ? `@${tp}|` + selectStr + '@' : selectStr
+      selecter.deleteFromDocument()
+      document.execCommand('insertHTML', 'false', newText)
+    }
+  }
+}
+</script>
+
+<style scoped>
+.buttoms {
+}
+
+</style>
