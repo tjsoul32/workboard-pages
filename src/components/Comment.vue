@@ -44,11 +44,6 @@ export default {
     },
     uncoll: function () {
       this.collapsed = 1
-    },
-    convert: function (content) {
-      var re = new RegExp('@([\u4E00-\uFA29]|[\uE7C7-\uE7F3]|[a-zA-Z0-9.])+@', 'g')
-      let contentNew = content.replace(re, '<button>' + '$&' + '</button>')
-      return contentNew
     }
   }
 }

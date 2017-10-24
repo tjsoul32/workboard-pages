@@ -1,11 +1,13 @@
 <template>
   <div class="convert">
     <div v-for="(it, index) in items">
-      <div v-if="it.type === 0">{{it.value}}</div>
-      <el-button v-if="it.type === 1">{{it.value}}</el-button>
-      <el-button v-if="it.type === 2" type="info">{{it.value}}</el-button>
-      <el-button v-if="it.type === 3" type="success">{{it.value}}</el-button>
-      <el-button v-if="it.type === 4" type="warning">{{it.value}}</el-button>
+      <div v-if="it.type === 0">{{ it.value }}</div>
+      <el-button v-if="it.type === 1">{{ it.value }}</el-button>
+      <el-button v-if="it.type === 2" type="info">{{ it.value }}</el-button>
+      <el-button v-if="it.type === 3" type="success">{{ it.value }}</el-button>
+      <el-button v-if="it.type === 4" type="warning">{{ it.value }}</el-button>
+      <a v-if="it.type === 10" :href="it.value">{{ it.value }}</a>
+      <h1 v-if="it.type === 20">{{ it.value }}</h1>
     </div>
 
   </div>
@@ -24,7 +26,8 @@ export default {
       let res = []
       let its = []
       let content = this.content
-      var re = /@\d+\|([\u4E00-\uFA29]|[a-zA-Z0-9.])+@/g
+      // var re = /@\d+\|([\u4E00-\uFA29]|[\uE7C7-\uE7F3]|[a-zA-Z0-9.:/])+@/g
+      var re = /@\d+\|.+@/g
       let rs = 1
       while (rs != null) {
         rs = re.exec(content)

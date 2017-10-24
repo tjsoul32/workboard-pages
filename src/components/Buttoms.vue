@@ -4,11 +4,12 @@
     <el-button @click="selectText(2)">info</el-button>
     <el-button @click="selectText(3)">success</el-button>
     <el-button @click="selectText(4)">warning</el-button>
+    <el-button @click="selectText(10)">href</el-button>
+    <el-button @click="selectText(20)">H1</el-button>
   </div>
 </template>
 
 <script>
-
 export default {
   name: 'buttoms',
   data () {
@@ -32,5 +33,4 @@ export default {
 <style scoped>
 .buttoms {
 }
-
 </style>
