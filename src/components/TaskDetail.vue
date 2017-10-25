@@ -4,6 +4,21 @@
       {{ key }}: {{ value }}
     </div>
 
+    <el-button-group>
+      <el-button :type="task.level === 1 ? 'info' : 'default'" @click="setLevel(1)">普通</el-button>
+      <el-button :type="task.level === 2 ? 'success' : 'default'" @click="setLevel(2)">重要</el-button>
+      <el-button :type="task.level === 3 ? 'warning' : 'default'" @click="setLevel(3)">很重要</el-button>
+      <el-button :type="task.level === 4 ? 'danger' : 'default'" @click="setLevel(4)">特别重要</el-button>
+    </el-button-group>
+
+    <el-dialog title="删除" :visible.sync="dialogFormVisible">
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="confirmdel">确 定</el-button>
+      </div>
+    </el-dialog>
+
+
     <el-card class="box-card">
       <transition-group name="fade" tag="div">
         <div v-for="(commit, index) in commits" :key="commit.commitid" class="fade-item">
@@ -51,13 +66,31 @@ export default {
       username: this.$store.state.user.username,
       task: {},
       commits: [],
-      textarea: ''
+      textarea: '',
+      dialogFormVisible: false,
+      commitFordel: ''
     }
   },
   computed: {
   },
   components: {Comment, Items},
   methods: {
+    setLevel: function (level) {
+      let vue = this
+      let params = new FormData()
+      params.append('username', this.username)
+      params.append('taskid', this.task.taskid)
+      params.append('level', level)
+
+      api('/tasksetlevel/', 'post', params, function (res) {
+        if (res.data.result === 'ok') {
+          vue.task.level = level
+          return true
+        } else {
+          return false
+        }
+      }, 'setlevel failed')
+    },
     submit: function () {
       if (this.textarea.length < 3) {
         this.$message({
@@ -99,6 +132,7 @@ export default {
         let params = new FormData()
         params.append('commitid', commit.commitid)
         params.append('content', commit.content)
+        params.append('taskid', this.task.taskid)
 
         api('/contentedit/', 'post', params, function (res) {
           if (res.data.result === 'ok') {
@@ -113,15 +147,21 @@ export default {
       }
     },
     del: function (commit) {
+      this.commitFordel = commit
+      this.dialogFormVisible = true
+    },
+    confirmdel: function () {
       let vue = this
       let params = new FormData()
-      params.append('commitid', commit.commitid)
+      params.append('commitid', this.commitFordel.commitid)
       params.append('username', this.username)
 
       api('/contentdel/', 'post', params, function (res) {
         if (res.data.result === 'ok') {
-          let index = vue.commits.indexOf(commit)
+          let index = vue.commits.indexOf(vue.commitFordel)
           vue.commits.splice(index, 1)
+          vue.commitFordel = ''
+          vue.dialogFormVisible = false
           return true
         } else {
           return false
@@ -132,7 +172,10 @@ export default {
   mounted () {
     let vue = this
     let taskid = this.$route.params.taskid
-    let params = {taskid: taskid}
+    let params = {
+      taskid: taskid,
+      username: this.username
+    }
 
     api('/taskdetail/', 'get', params, function (res) {
       vue.task = res.data.task
