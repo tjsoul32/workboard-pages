@@ -12,8 +12,8 @@
   
           <div v-if="commit.author_name === username">
             <div v-if="commit.edit">
-              <Buttoms></Buttoms>
-              <el-input type="textarea" :row="5" v-model="commit.content"></el-input>
+              <Items></Items>
+              <el-input type="textarea" :row="15" v-model="commit.content"></el-input>
             </div>
             <div v-else>
               <Comment :content="commit.content"></Comment>
@@ -33,7 +33,7 @@
     </el-card>
 
     <br>
-    <Buttoms></Buttoms>
+    <Items></Items>
     <el-input type="textarea" :rows="5" v-model="textarea"></el-input>
     <el-button @click="submit">submit</el-button>
   </div>
@@ -41,7 +41,7 @@
 
 <script>
 import Comment from './Comment'
-import Buttoms from './Buttoms'
+import Items from './Items'
 import api from '@/api/api-workboard'
 
 export default {
@@ -56,7 +56,7 @@ export default {
   },
   computed: {
   },
-  components: {Comment, Buttoms},
+  components: {Comment, Items},
   methods: {
     submit: function () {
       if (this.textarea.length < 3) {
@@ -86,11 +86,11 @@ export default {
     edit: function (commit) {
       if (!commit.edit) {
         commit.edit = 1
-        commit.contentEdit = commit.content.trim()
+        commit.contentEdit = commit.content
         this.$set(this.commits, this.commits.indexOf(commit), commit)
       } else {
         let vue = this
-        if (commit.content.trim() === commit.contentEdit) {
+        if (commit.content === commit.contentEdit) {
           commit.edit = 0
           commit.contentEdit = ''
           vue.$set(vue.commits, vue.commits.indexOf(commit), commit)
@@ -98,7 +98,7 @@ export default {
         }
         let params = new FormData()
         params.append('commitid', commit.commitid)
-        params.append('content', commit.content.trim())
+        params.append('content', commit.content)
 
         api('/contentedit/', 'post', params, function (res) {
           if (res.data.result === 'ok') {

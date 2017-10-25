@@ -1,18 +1,21 @@
 <template>
-  <div class="convert">
-    <div v-for="(it, index) in items">
-      <div v-if="it.type === 0">{{ it.value }}</div>
-      <el-button v-if="it.type === 1">{{ it.value }}</el-button>
-      <el-button v-if="it.type === 2" type="info">{{ it.value }}</el-button>
-      <el-button v-if="it.type === 3" type="success">{{ it.value }}</el-button>
-      <el-button v-if="it.type === 4" type="warning">{{ it.value }}</el-button>
-      <a v-if="it.type === 10" :href="it.value">{{ it.value }}</a>
-      <h1 v-if="it.type === 20">{{ it.value }}</h1>
+  <el-card class="box-card">
+    <div v-for="(item, index) in items" style="display: block;">
+      <br v-if="item[0].type === 999">
+      <span v-for="it in item" style="float:left; display:block!important;" v-else>
+        <pre v-if="it.type === 0">{{ it.value }}</pre>
+        <el-button v-if="it.type === 1">{{ it.value }}</el-button>
+        <el-button v-if="it.type === 2" type="info">{{ it.value }}</el-button>
+        <el-button v-if="it.type === 3" type="success">{{ it.value }}</el-button>
+        <el-button v-if="it.type === 4" type="warning">{{ it.value }}</el-button>
+        <a v-if="it.type === 10" :href="it.value">{{ it.value }}</a>
+        <h1 v-if="it.type === 21">{{ it.value }}</h1>
+        <h2 v-if="it.type === 22">{{ it.value }}</h2>
+        <h3 v-if="it.type === 23">{{ it.value }}</h3>
+      </span>
     </div>
-
-  </div>
+  </el-card>
 </template>
-
 <script>
 export default {
   name: 'convert',
@@ -23,41 +26,47 @@ export default {
   props: ['content'],
   computed: {
     items: function () {
-      let res = []
-      let its = []
-      let content = this.content
-      // var re = /@\d+\|([\u4E00-\uFA29]|[\uE7C7-\uE7F3]|[a-zA-Z0-9.:/])+@/g
-      var re = /@\d+\|.+@/g
-      let rs = 1
-      while (rs != null) {
-        rs = re.exec(content)
-        let it = {}
-        it.value = rs ? rs[0].split('|')[1].slice(0, rs[0].split('|')[1].length - 1) : ''
-        it.raw = rs ? rs[0] : ''
-        it.type = rs ? parseInt(rs[0].split('|')[0].slice(1)) : 0
-        it.index = rs ? re.lastIndex - rs[0].length : content.length
-        its.push(it)
-      }
-      let now = 0
-      for (let it of its) {
-        if (it.type !== 0) {
-          let before = {}
-          before.type = 0
-          before.value = content.slice(now, it.index)
-          res.push(before)
-          now += before.value.length
-        }
+      let blocks = []
+      let contents = this.content.split('\n')
+      for (let content of contents) {
+        let block = []
+        let its = []
+        blocks.push([{type: 999}])
 
-        res.push(it)
-        now += it.raw.length
+        if (content.trim().length > 0) {
+          var re = /@\d+\|.+?@/g
+          let rs = 1
+          while (rs != null) {
+            rs = re.exec(content)
+            let it = {}
+            it.value = rs ? rs[0].split('|')[1].slice(0, rs[0].split('|')[1].length - 1) : ''
+            it.raw = rs ? rs[0] : ''
+            it.type = rs ? parseInt(rs[0].split('|')[0].slice(1)) : 0
+            it.index = rs ? re.lastIndex - rs[0].length : content.length
+            its.push(it)
+          }
+          let now = 0
+          for (let it of its) {
+            if (it.type !== 0) {
+              let before = {}
+              before.type = 0
+              before.value = content.slice(now, it.index)
+              block.push(before)
+              now += before.value.length
+            }
+            block.push(it)
+            now += it.raw.length
+          }
+          block.push({
+            type: 0,
+            value: content.slice(now)
+          })
+        } else {
+          block.push({type: 999})
+        }
+        blocks.push(block)
       }
-      // console.log(content)
-      // console.log(now)
-      res.push({
-        type: 0,
-        value: content.slice(now)
-      })
-      return res
+      return blocks
     }
   },
   methods: {

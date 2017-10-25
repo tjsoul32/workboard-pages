@@ -5,7 +5,9 @@
     <el-button @click="selectText(3)">success</el-button>
     <el-button @click="selectText(4)">warning</el-button>
     <el-button @click="selectText(10)">href</el-button>
-    <el-button @click="selectText(20)">H1</el-button>
+    <el-button @click="selectText(21)">H1</el-button>
+    <el-button @click="selectText(22)">H2</el-button>
+    <el-button @click="selectText(23)">H3</el-button>
   </div>
 </template>
 
