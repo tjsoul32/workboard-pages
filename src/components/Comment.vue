@@ -51,7 +51,6 @@ export default {
 
 <style scoped>
 .comment {
-  word-wrap: break-word;
 }
 
 </style>

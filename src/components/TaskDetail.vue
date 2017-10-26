@@ -28,7 +28,7 @@
           <div v-if="commit.author_name === username">
             <div v-if="commit.edit">
               <Items></Items>
-              <el-input type="textarea" :row="15" v-model="commit.content"></el-input>
+              <el-input type="textarea" style="white-space:nowrap;" :autosize="{ minRows: 15, maxRows: 20}" v-model="commit.content"></el-input>
             </div>
             <div v-else>
               <Comment :content="commit.content"></Comment>
@@ -48,9 +48,11 @@
     </el-card>
 
     <br>
-    <Items></Items>
-    <el-input type="textarea" :rows="5" v-model="textarea"></el-input>
-    <el-button @click="submit">submit</el-button>
+    <el-card class="box-card">
+      <Items></Items>
+      <el-input type="textarea" style="white-space:nowrap; overflow:auto;" :autosize="{ minRows: 10, maxRows: 15}" v-model="textarea"></el-input>
+      <el-button @click="submit">submit</el-button>
+    </el-card>
   </div>
 </template>
 
@@ -75,6 +77,29 @@ export default {
   },
   components: {Comment, Items},
   methods: {
+    getTaskDetail: function () {
+      let vue = this
+      let taskid = this.$route.params.taskid
+      let params = {
+        taskid: taskid,
+        username: this.username
+      }
+      api('/taskdetail/', 'get', params, function (res) {
+        vue.task = res.data.task
+        vue.commits = res.data.commits
+      })
+    },
+    getTaskInfo: function () {
+      let vue = this
+      let taskid = this.$route.params.taskid
+      let params = {
+        taskid: taskid,
+        username: this.username
+      }
+      api('/taskinfo/', 'get', params, function (res) {
+        vue.task = res.data.task
+      })
+    },
     setLevel: function (level) {
       let vue = this
       let params = new FormData()
@@ -110,6 +135,7 @@ export default {
         if (res.data.result === 'ok') {
           vue.commits.push(res.data.commit)
           vue.textarea = ''
+          vue.getTaskInfo()
           return true
         } else {
           return false
@@ -139,6 +165,7 @@ export default {
             commit.edit = 0
             commit.contentEdit = ''
             vue.$set(vue.commits, vue.commits.indexOf(commit), commit)
+            vue.getTaskInfo()
             return true
           } else {
             return false
@@ -170,17 +197,7 @@ export default {
     }
   },
   mounted () {
-    let vue = this
-    let taskid = this.$route.params.taskid
-    let params = {
-      taskid: taskid,
-      username: this.username
-    }
-
-    api('/taskdetail/', 'get', params, function (res) {
-      vue.task = res.data.task
-      vue.commits = res.data.commits
-    })
+    this.getTaskDetail()
   }
 }
 </script>

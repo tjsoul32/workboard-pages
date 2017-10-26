@@ -38,7 +38,7 @@
 
     <el-row v-for="(taskline, line) in tasks" :key="line">
       <el-col :span="6" v-for="(task, index) in taskline" :key="index" style="padding: 5px;">
-        <div style="margin-top: 20px; height: 200px;" @mouseenter="slidein(task)" @mouseleave="slideout(task)" :style="task.border">
+        <div style="margin-top: 20px; height: 200px;" @click="slidechange(task)" @mouseenter="slidein(task)" @mouseleave="slideout(task)" :style="task.border">
           <el-collapse-transition>
             <div v-show="task.detail">
               <div class="transition-box" @click="entertask(task)">{{ task.taskid }}: {{ task.search }}</div>
@@ -108,6 +108,10 @@ export default {
   },
   components: { Items },
   methods: {
+    slidechange: function (task) {
+      task.detail = Math.abs(task.detail - 1)
+      this.$set(this.tasks_raw, this.tasks_raw.indexOf(task), task)
+    },
     slidein: function (task) {
       task.detail = 1
       this.$set(this.tasks_raw, this.tasks_raw.indexOf(task), task)
@@ -140,7 +144,7 @@ export default {
       api('/taskadd/', 'post', params, function (res) {
         if (res.data.result === 'ok') {
           vue.dialogFormVisible = false
-          vue.$router.push({ path: '/tasklist/' })
+          vue.gettasks()
         } else {
           return false
         }

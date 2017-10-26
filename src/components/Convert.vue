@@ -1,8 +1,8 @@
 <template>
-  <el-card class="box-card">
-    <div v-for="(item, index) in items" style="display: block;">
+  <el-card class="box-card" style="overflow: auto;">
+    <div v-for="(item, index) in items" :style="item[0].type === 999 ? 'display: block;' : 'display: block;clear: both'">
       <br v-if="item[0].type === 999">
-      <span v-for="it in item" style="float:left; display:block!important;" v-else>
+      <span v-for="it in item" style="float:left; display:block!important; text-align:left;" v-else>
         <pre v-if="it.type === 0">{{ it.value }}</pre>
         <el-button v-if="it.type === 1">{{ it.value }}</el-button>
         <el-button v-if="it.type === 2" type="info">{{ it.value }}</el-button>
@@ -16,6 +16,7 @@
     </div>
   </el-card>
 </template>
+
 <script>
 export default {
   name: 'convert',
@@ -27,7 +28,7 @@ export default {
   computed: {
     items: function () {
       let blocks = []
-      let contents = this.content.split('\n')
+      let contents = this.content.split(/[\n]/)
       for (let content of contents) {
         let block = []
         let its = []
