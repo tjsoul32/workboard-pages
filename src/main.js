@@ -8,13 +8,14 @@ import App from './App'
 import VueRouter from 'vue-router'
 import store from './store'
 import routes from './router'
+import VueParticles from 'vue-particles'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 
 Vue.config.productionTip = false
-
 Vue.use(VueRouter)
 Vue.use(ElementUI)
+Vue.use(VueParticles)
 Vue.component(CollapseTransition.name, CollapseTransition)
 
 NProgress.configure({ showSpinner: true })
@@ -29,7 +30,7 @@ router.beforeEach((to, from, next) => {
   NProgress.start()
   if (store.state.user.token) {
     if (to.path === '/login') {
-      next({ path: '/tasklist' })
+      next(from.path)
     } else {
       next()
     }

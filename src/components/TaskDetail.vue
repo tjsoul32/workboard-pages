@@ -1,9 +1,35 @@
 <template>
   <div class="taskdetail">
-    <div v-for="(value, key) in task">
-      {{ key }}: {{ value }}
+
+    <el-dialog title="member" :visible.sync="dialogFormVisible_member">
+      <el-form>
+        <div v-for="(user, index) in task.member" :key="index">
+          <el-button type="info" @click.native="selectOperator(user)" v-if="task.operator.indexOf(user) !== -1">{{ user }}</el-button>
+          <el-button @click.native="selectOperator(user)" v-else>{{ user }}</el-button>
+          <el-button @click.native="unSelectUser(user)">X</el-button>
+        </div>
+
+        <el-form-item label="成员" label-width="120px">
+          <el-input auto-complete="off" v-model='input' @keyup.native="searchUser"></el-input>
+        </el-form-item>
+      </el-form>
+      <el-button v-for="(user, index) in selects" :key="index" @click.native="selectUser(user)">{{ user }}</el-button>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible_member = false">取 消</el-button>
+        <el-button type="primary" @click="confirmMember">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <div>更新时间: {{ task.update_time }}</div>
+    <div>创建人: {{ task.creator }} </div>
+
+    <div>成员：
+      <el-button :type="(task.operator.indexOf(m) > -1) ? 'info' : 'default'" v-for="(m, index) in task.member" :key="index" >{{m}}</el-button>
+      <el-button @click="editmember" v-if="editor > 0"><i class="el-icon-edit"></i></el-button>
     </div>
 
+    <div>创建时间: {{ task.create_time }}</div>
     <el-button-group>
       <el-button :type="task.level === 1 ? 'info' : 'default'" @click="setLevel(1)">普通</el-button>
       <el-button :type="task.level === 2 ? 'success' : 'default'" @click="setLevel(2)">重要</el-button>
@@ -18,7 +44,6 @@
       </div>
     </el-dialog>
 
-
     <el-card class="box-card">
       <transition-group name="fade" tag="div">
         <div v-for="(commit, index) in commits" :key="commit.commitid" class="fade-item">
@@ -28,7 +53,7 @@
           <div v-if="commit.author_name === username">
             <div v-if="commit.edit">
               <Items></Items>
-              <el-input type="textarea" style="white-space:nowrap;" :autosize="{ minRows: 15, maxRows: 20}" v-model="commit.content"></el-input>
+              <textarea class="el-textarea" v-model="commit.content"></textarea>
             </div>
             <div v-else>
               <Comment :content="commit.content"></Comment>
@@ -39,10 +64,11 @@
           </div>
   
           <div v-else>
-            <el-button>{{ commit.author_name }}</el-button>
             <Comment :content="commit.content"></Comment>
+            <el-button>{{ commit.author_name }}</el-button>
+            <el-button @click="del(commit)" v-if="task.operator.indexOf(username) > -1">X</el-button>
           </div>
-  
+          <hr>  
         </div>
       </transition-group>
     </el-card>
@@ -50,7 +76,7 @@
     <br>
     <el-card class="box-card">
       <Items></Items>
-      <el-input type="textarea" style="white-space:nowrap; overflow:auto;" :autosize="{ minRows: 10, maxRows: 15}" v-model="textarea"></el-input>
+      <textarea class="el-textarea" v-model="textarea"></textarea>
       <el-button @click="submit">submit</el-button>
     </el-card>
   </div>
@@ -69,14 +95,85 @@ export default {
       task: {},
       commits: [],
       textarea: '',
+      commitFordel: '',
       dialogFormVisible: false,
-      commitFordel: ''
+      dialogFormVisible_member: false,
+      users: [],
+      usersForSelect: [],
+      input: '',
+      selects: []
     }
   },
   computed: {
+    editor: function () {
+      return this.task.operator && this.task.operator.indexOf(this.username) > -1 ? 1 : 0
+    }
   },
   components: {Comment, Items},
   methods: {
+    editmember: function () {
+      this.dialogFormVisible_member = true
+    },
+    getusers: function () {
+      let vue = this
+      api('/userlist/', 'get', {}, function (res) {
+        for (let u of res.data) {
+          if (u.username !== vue.username) {
+            vue.users.push(u.username)
+          }
+        }
+      })
+    },
+    searchUser: function () {
+      this.selects = []
+      this.usersForSelect = this.users
+      let ipts = this.input.split(' ').filter(function (d) {
+        if (d) { return d }
+      })
+
+      for (let u of this.usersForSelect) {
+        for (let i of ipts) {
+          if (u.indexOf(i) > -1 && this.task.member.indexOf(u) === -1 && this.selects.indexOf(u) === -1) {
+            this.selects.push(u)
+          }
+        }
+      }
+    },
+    selectUser: function (user) {
+      this.task.member.push(user)
+      this.selects.splice(this.selects.indexOf(user), 1)
+    },
+    unSelectUser: function (user) {
+      if (user !== this.username) {
+        this.selects.push(user)
+        this.task.member.splice(this.task.member.indexOf(user), 1)
+      }
+    },
+    selectOperator: function (user) {
+      let idx = this.task.operator.indexOf(user)
+      if (idx === -1) {
+        this.task.operator.push(user)
+      } else if (user !== this.username) {
+        this.task.operator.splice(idx, 1)
+      }
+    },
+    confirmMember: function () {
+      let vue = this
+      let params = new FormData()
+      params.append('username', this.username)
+      params.append('taskid', this.task.taskid)
+      params.append('member', this.task.member)
+      params.append('operator', this.task.operator)
+
+      api('/tasksetmember/', 'post', params, function (res) {
+        if (res.data.result === 'ok') {
+          vue.dialogFormVisible_member = false
+          return true
+        } else {
+          return false
+        }
+      }, 'setmember failed')
+    },
     getTaskDetail: function () {
       let vue = this
       let taskid = this.$route.params.taskid
@@ -182,6 +279,7 @@ export default {
       let params = new FormData()
       params.append('commitid', this.commitFordel.commitid)
       params.append('username', this.username)
+      params.append('taskid', this.task.taskid)
 
       api('/contentdel/', 'post', params, function (res) {
         if (res.data.result === 'ok') {
@@ -198,6 +296,7 @@ export default {
   },
   mounted () {
     this.getTaskDetail()
+    this.getusers()
   }
 }
 </script>
@@ -211,12 +310,35 @@ export default {
 .fade-item {
   transition: all 1s;
 }
+
 .fade-enter, .fade-leave-to {
   opacity: 0;
   transform: translateX(50px);
 }
+
 .fade-leave-active {
   position: absolute;
+}
+
+.el-textarea {
+  display: block;
+  resize: vertical;
+  padding: 5px 7px;
+  line-height: 1.5;
+  width: 100%;
+  color: #1f2d3d;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #bfcbd9;
+  border-radius: 4px;
+  transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+  white-space:nowrap;
+  overflow: auto;
+  word-wrap: normal;
+  background-color: #FFFFF0;
+  min-height: 400px;
+  max-height: 850px;
+  margin-top: 10px
 }
 
 </style>

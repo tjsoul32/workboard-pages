@@ -13,7 +13,6 @@
           </el-button-group>
         </el-form-item>
         <el-form-item label="任务描述" :label-width="formLabelWidth">
-          <Items></Items>
           <el-input type="textarea" :row="15" v-model="form.description" auto-complete="off"></el-input>
         </el-form-item>
 
@@ -61,7 +60,6 @@
 
 <script>
 import api from '@/api/api-workboard'
-import Items from './Items'
 
 export default {
   name: 'TaskList',
@@ -79,7 +77,6 @@ export default {
       Color: {
         1: '#73ccff', 2: '#42d885', 3: '#f7ba2a', 4: '#ff4949'
       },
-      dialogTableVisible: false,
       dialogFormVisible: false,
       form: {
         description: '',
@@ -106,7 +103,6 @@ export default {
       return tks
     }
   },
-  components: { Items },
   methods: {
     slidechange: function (task) {
       task.detail = Math.abs(task.detail - 1)

@@ -23,6 +23,8 @@ export default {
   methods: {
     selectText: function (tp) {
       let selecter = window.getSelection()
+      // console.log(window.getSelection().getRangeAt(0))
+
       let selectStr = selecter.toString()
       let newText = selectStr.trim() ? `@${tp}|` + selectStr + '@' : selectStr
       selecter.deleteFromDocument()

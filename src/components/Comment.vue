@@ -1,6 +1,6 @@
 <template>
   <div class="comment">
-    <div v-if="contentLen <= 200">
+    <div v-if="contentRows <= 10">
       <Convert :content="content"></Convert>
     </div>
 
@@ -32,10 +32,10 @@ export default {
   components: {Convert},
   computed: {
     display: function () {
-      return this.content.substr(0, 200) + '......'
+      return this.content.split('\n').slice(0, 10).join('\n') + '......'
     },
-    contentLen: function () {
-      return this.content.length
+    contentRows: function () {
+      return this.content.split('\n').length
     }
   },
   methods: {
