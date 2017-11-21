@@ -3,17 +3,10 @@
 
     <el-dialog title="member" :visible.sync="dialogFormVisible_member">
       <el-form>
-        <div v-for="(user, index) in task.member" :key="index">
-          <el-button type="info" @click.native="selectOperator(user)" v-if="task.operator.indexOf(user) !== -1">{{ user }}</el-button>
-          <el-button @click.native="selectOperator(user)" v-else>{{ user }}</el-button>
-          <el-button @click.native="unSelectUser(user)">X</el-button>
-        </div>
 
-        <el-form-item label="成员" label-width="120px">
-          <el-input auto-complete="off" v-model='input' @keyup.native="searchUser"></el-input>
-        </el-form-item>
+        <SearchUser :member="task.member" :operator="task.operator"></SearchUser>
+
       </el-form>
-      <el-button v-for="(user, index) in selects" :key="index" @click.native="selectUser(user)">{{ user }}</el-button>
 
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible_member = false">取 消</el-button>
@@ -86,6 +79,7 @@
 import Comment from './Comment'
 import Items from './Items'
 import api from '@/api/api-workboard'
+import SearchUser from './SearchUser'
 
 export default {
   name: 'TaskDetail',
@@ -97,11 +91,7 @@ export default {
       textarea: '',
       commitFordel: '',
       dialogFormVisible: false,
-      dialogFormVisible_member: false,
-      users: [],
-      usersForSelect: [],
-      input: '',
-      selects: []
+      dialogFormVisible_member: false
     }
   },
   computed: {
@@ -109,53 +99,10 @@ export default {
       return this.task.operator && this.task.operator.indexOf(this.username) > -1 ? 1 : 0
     }
   },
-  components: {Comment, Items},
+  components: {Comment, Items, SearchUser},
   methods: {
     editmember: function () {
       this.dialogFormVisible_member = true
-    },
-    getusers: function () {
-      let vue = this
-      api('/userlist/', 'get', {}, function (res) {
-        for (let u of res.data) {
-          if (u.username !== vue.username) {
-            vue.users.push(u.username)
-          }
-        }
-      })
-    },
-    searchUser: function () {
-      this.selects = []
-      this.usersForSelect = this.users
-      let ipts = this.input.split(' ').filter(function (d) {
-        if (d) { return d }
-      })
-
-      for (let u of this.usersForSelect) {
-        for (let i of ipts) {
-          if (u.indexOf(i) > -1 && this.task.member.indexOf(u) === -1 && this.selects.indexOf(u) === -1) {
-            this.selects.push(u)
-          }
-        }
-      }
-    },
-    selectUser: function (user) {
-      this.task.member.push(user)
-      this.selects.splice(this.selects.indexOf(user), 1)
-    },
-    unSelectUser: function (user) {
-      if (user !== this.username) {
-        this.selects.push(user)
-        this.task.member.splice(this.task.member.indexOf(user), 1)
-      }
-    },
-    selectOperator: function (user) {
-      let idx = this.task.operator.indexOf(user)
-      if (idx === -1) {
-        this.task.operator.push(user)
-      } else if (user !== this.username) {
-        this.task.operator.splice(idx, 1)
-      }
     },
     confirmMember: function () {
       let vue = this
@@ -164,6 +111,7 @@ export default {
       params.append('taskid', this.task.taskid)
       params.append('member', this.task.member)
       params.append('operator', this.task.operator)
+      params.append('level', this.task.level)
 
       api('/tasksetmember/', 'post', params, function (res) {
         if (res.data.result === 'ok') {
@@ -296,7 +244,6 @@ export default {
   },
   mounted () {
     this.getTaskDetail()
-    this.getusers()
   }
 }
 </script>

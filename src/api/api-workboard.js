@@ -1,8 +1,8 @@
-import axios from 'axios'
+import service from './service'
 
-export default function (uri, method, params, success, msg = '') {
+const api = function (uri, method, params, success, msg = '') {
   method = method.toLowerCase()
-  return axios({
+  return service({
     method: method,
     url: 'http://192.168.151.66:12354' + uri.trim(),
     data: method === 'post' || method === 'put' ? params : null,
@@ -21,3 +21,5 @@ export default function (uri, method, params, success, msg = '') {
     return false
   })
 }
+
+export default api

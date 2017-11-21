@@ -4,7 +4,7 @@
 
     <el-dialog title="创建任务" :visible.sync="dialogFormVisible">
       <el-form :model="form">
-        <el-form-item label="LEVEL" :label-width="formLabelWidth">
+        <el-form-item label="LEVEL" label-width="120px">
           <el-button-group>
             <el-button :type="level === 1 ? 'info' : 'default'" @click="setLevel(1)">普通</el-button>
             <el-button :type="level === 2 ? 'success' : 'default'" @click="setLevel(2)">重要</el-button>
@@ -12,22 +12,13 @@
             <el-button :type="level === 4 ? 'danger' : 'default'" @click="setLevel(4)">特别重要</el-button>
           </el-button-group>
         </el-form-item>
-        <el-form-item label="任务描述" :label-width="formLabelWidth">
+        <el-form-item label="任务描述" label-width="120px">
           <el-input type="textarea" :row="15" v-model="form.description" auto-complete="off"></el-input>
         </el-form-item>
 
-        <div v-for="(user, index) in member" :key="index">
-          <el-button type="info" @click.native="selectOperator(user)" v-if="operator.indexOf(user) !== -1">{{ user }}</el-button>
-          <el-button @click.native="selectOperator(user)" v-else>{{ user }}</el-button>
+        <SearchUser :member="member" :operator="operator"></SearchUser>
 
-          <el-button @click.native="unSelectUser(user)">X</el-button>
-        </div>
-
-        <el-form-item label="成员" :label-width="formLabelWidth">
-          <el-input auto-complete="off" v-model='input' @keyup.native="searchUser"></el-input>
-        </el-form-item>
       </el-form>
-      <el-button v-for="(user, index) in selects" :key="index" @click.native="selectUser(user)">{{ user }}</el-button>
 
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -60,17 +51,14 @@
 
 <script>
 import api from '@/api/api-workboard'
+import SearchUser from './SearchUser'
 
 export default {
   name: 'TaskList',
   data () {
     return {
       username: this.$store.state.user.username,
-      users: [],
-      usersForSelect: [],
-      input: '',
       level: 1,
-      selects: [],
       operator: [],
       member: [],
       tasks_raw: [],
@@ -81,8 +69,7 @@ export default {
       form: {
         description: '',
         search: ''
-      },
-      formLabelWidth: '120px'
+      }
     }
   },
   computed: {
@@ -103,6 +90,7 @@ export default {
       return tks
     }
   },
+  components: {SearchUser},
   methods: {
     slidechange: function (task) {
       task.detail = Math.abs(task.detail - 1)
@@ -154,54 +142,12 @@ export default {
         vue.tasks_raw = res.data
       })
     },
-    getusers: function () {
-      let vue = this
-      api('/userlist/', 'get', {}, function (res) {
-        for (let u of res.data) {
-          if (u.username !== vue.username) {
-            vue.users.push(u.username)
-          }
-        }
-      })
-    },
-    searchUser: function () {
-      this.selects = []
-      this.usersForSelect = this.users
-      let ipts = this.input.split(' ').filter(function (d) {
-        if (d) { return d }
-      })
-
-      for (let u of this.usersForSelect) {
-        for (let i of ipts) {
-          if (u.indexOf(i) > -1 && this.member.indexOf(u) === -1 && this.selects.indexOf(u) === -1) {
-            this.selects.push(u)
-          }
-        }
-      }
-    },
-    selectUser: function (user) {
-      this.member.push(user)
-      this.selects.splice(this.selects.indexOf(user), 1)
-    },
-    unSelectUser: function (user) {
-      this.selects.push(user)
-      this.member.splice(this.member.indexOf(user), 1)
-    },
-    selectOperator: function (user) {
-      let idx = this.operator.indexOf(user)
-      if (idx === -1) {
-        this.operator.push(user)
-      } else {
-        this.operator.splice(idx, 1)
-      }
-    },
     setLevel: function (level) {
       this.level = level
     }
   },
   mounted () {
     this.gettasks()
-    this.getusers()
   }
 }
 </script>
