@@ -4,7 +4,7 @@
     <el-dialog title="member" :visible.sync="dialogFormVisible_member">
       <el-form>
 
-        <SearchUser :member="task.member" :operator="task.operator"></SearchUser>
+        <SearchUser :username="username" :member="task.member" :operator="task.operator"></SearchUser>
 
       </el-form>
 

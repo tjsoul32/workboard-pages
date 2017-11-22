@@ -16,7 +16,7 @@
           <el-input type="textarea" :row="15" v-model="form.description" auto-complete="off"></el-input>
         </el-form-item>
 
-        <SearchUser :member="member" :operator="operator"></SearchUser>
+        <SearchUser :username="username" :member="member" :operator="operator"></SearchUser>
 
       </el-form>
 
@@ -115,7 +115,7 @@ export default {
       this.$router.push({ path: '/taskdetail/' + id })
     },
     addtask: function () {
-      if (this.member.length === 0 || this.form.description.trim().length === 0) { return false }
+      if (this.form.description.trim().length === 0) { return false }
 
       let vue = this
       let params = new FormData()

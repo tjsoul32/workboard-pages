@@ -7,6 +7,7 @@
         <logout></logout>
       </div>
       <router-link to="/tasklist">tasklist</router-link>
+      <router-link to="/taskagg">taskagg</router-link>
       <router-view></router-view>
     </div>
 

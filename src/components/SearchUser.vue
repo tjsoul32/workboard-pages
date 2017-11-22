@@ -25,13 +25,14 @@ export default {
       users: []
     }
   },
-  props: ['member', 'operator'],
+  props: ['username', 'member', 'operator'],
   computed: {
   },
   methods: {
     getusers: function () {
       let vue = this
-      api('/userlist/', 'get', {}, function (res) {
+      let params = { username: this.username }
+      api('/userlist/', 'get', params, function (res) {
         for (let u of res.data) {
           if (u.username !== vue.username) {
             vue.users.push(u.username)
@@ -55,11 +56,13 @@ export default {
       }
     },
     selectOperator: function (user) {
-      let idx = this.operator.indexOf(user)
-      if (idx === -1) {
-        this.operator.push(user)
-      } else {
-        this.operator.splice(idx, 1)
+      if (user !== this.username) {
+        let idx = this.operator.indexOf(user)
+        if (idx === -1) {
+          this.operator.push(user)
+        } else {
+          this.operator.splice(idx, 1)
+        }
       }
     },
     selectUser: function (user) {
@@ -67,11 +70,13 @@ export default {
       this.selects.splice(this.selects.indexOf(user), 1)
     },
     unSelectUser: function (user) {
-      this.selects.push(user)
-      this.member.splice(this.member.indexOf(user), 1)
-      const isOps = this.operator.indexOf(user)
-      if (isOps > -1) {
-        this.operator.splice(isOps, 1)
+      if (user !== this.username) {
+        this.selects.push(user)
+        this.member.splice(this.member.indexOf(user), 1)
+        const isOps = this.operator.indexOf(user)
+        if (isOps > -1) {
+          this.operator.splice(isOps, 1)
+        }
       }
     }
   },
