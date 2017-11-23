@@ -1,6 +1,8 @@
 <template>
   <div class="taskdetail">
-
+    <button @click="previous"><=</button>
+    <button @click="backToList">O</button>
+    <button @click="after">=></button>
     <el-dialog title="member" :visible.sync="dialogFormVisible_member">
       <el-form>
 
@@ -23,6 +25,7 @@
     </div>
 
     <div>创建时间: {{ task.create_time }}</div>
+
     <el-button-group>
       <el-button :type="task.level === 1 ? 'info' : 'default'" @click="setLevel(1)">普通</el-button>
       <el-button :type="task.level === 2 ? 'success' : 'default'" @click="setLevel(2)">重要</el-button>
@@ -76,10 +79,10 @@
 </template>
 
 <script>
-import Comment from './Comment'
-import Items from './Items'
+import Comment from '@/components/Comment'
+import Items from '@/components/Items'
 import api from '@/api/api-workboard'
-import SearchUser from './SearchUser'
+import SearchUser from '@/components/SearchUser'
 
 export default {
   name: 'TaskDetail',
@@ -100,6 +103,12 @@ export default {
     }
   },
   components: {Comment, Items, SearchUser},
+  props: ['isList', 'taskidNow'],
+  watch: {
+    taskidNow: function () {
+      this.getTaskDetail()
+    }
+  },
   methods: {
     editmember: function () {
       this.dialogFormVisible_member = true
@@ -124,7 +133,7 @@ export default {
     },
     getTaskDetail: function () {
       let vue = this
-      let taskid = this.$route.params.taskid
+      let taskid = this.taskidNow
       let params = {
         taskid: taskid,
         username: this.username
@@ -136,9 +145,8 @@ export default {
     },
     getTaskInfo: function () {
       let vue = this
-      let taskid = this.$route.params.taskid
       let params = {
-        taskid: taskid,
+        taskid: this.taskidNow,
         username: this.username
       }
       api('/taskinfo/', 'get', params, function (res) {
@@ -240,10 +248,20 @@ export default {
           return false
         }
       }, 'commit delete failed')
+    },
+    previous: function () {
+      this.$emit('previous')
+    },
+    after: function () {
+      this.$emit('after')
+    },
+    backToList: function () {
+      this.task = {}
+      this.commits = []
+      this.$emit('backToList')
     }
   },
   mounted () {
-    this.getTaskDetail()
   }
 }
 </script>

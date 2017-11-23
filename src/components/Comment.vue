@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import Convert from './Convert'
+import Convert from '@/components/Convert'
 
 export default {
   name: 'comment',

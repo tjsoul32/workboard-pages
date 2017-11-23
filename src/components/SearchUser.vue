@@ -81,6 +81,10 @@ export default {
     }
   },
   mounted () {
+    this.selects = []
+    this.usersForSelect = []
+    this.input = ''
+    this.users = []
     this.getusers()
   }
 }
