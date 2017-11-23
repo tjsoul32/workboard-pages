@@ -1,10 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 // import HelloWorld from '@/components/HelloWorld'
-import TaskList from '@/components/TaskList'
-import TaskDetail from '@/components/TaskDetail'
+import TaskList from '@/views/TaskList'
+import TaskAgg from '@/views/TaskAgg'
 import Login from '@/components/Login'
-import Index from '@/components/Index'
+import Index from '@/views/Index'
+
+import About from '@/views/About'
 
 Vue.use(Router)
 
@@ -12,22 +14,36 @@ let routes = [
   {
     path: '/login',
     name: 'Login',
+    hidden: true,
     component: Login
   },
   {
     path: '/',
-    name: 'Index',
+    name: '任务列表',
     component: Index,
+    redirect: { name: 'TaskList' },
     children: [
       {
-        path: '/tasklist', // 任务列表
+        path: '/tasklist',
         name: 'TaskList',
         component: TaskList
       },
       {
-        path: '/taskdetail/:taskid', // 任务详情
-        name: 'TaskDetail',
-        component: TaskDetail
+        path: '/taskagg',
+        name: 'TaskAgg',
+        component: TaskAgg
+      }
+    ]
+  },
+  {
+    path: '/',
+    name: '其他',
+    component: Index,
+    children: [
+      {
+        path: '/about',
+        name: '关于',
+        component: About
       }
     ]
   }

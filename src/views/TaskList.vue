@@ -55,6 +55,7 @@
 </template>
 
 <script>
+import { Message } from 'element-ui'
 import api from '@/api/api-workboard'
 import SearchUser from '@/components/SearchUser'
 import TaskDetail from '@/components/TaskDetail'
@@ -161,6 +162,11 @@ export default {
             this.taskidNow = this.tasks_raw[idx - 1].taskid
             break
           } else {
+            Message({
+              message: '已到头',
+              type: 'info',
+              duration: 3000
+            })
           }
         }
       }
@@ -173,6 +179,11 @@ export default {
             this.taskidNow = this.tasks_raw[idx + 1].taskid
             break
           } else {
+            Message({
+              message: '已到底',
+              type: 'info',
+              duration: 3000
+            })
           }
         }
       }

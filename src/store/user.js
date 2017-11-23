@@ -4,15 +4,23 @@ import { getToken, setToken, removeToken, getUsername, setUsername, removeUserna
 const user = {
   state: {
     username: getUsername(),
-    token: getToken()
+    token: getToken(),
+    breadListState: [
+      {name: '首页', path: '/'}
+    ]
   },
-
   mutations: {
     SET_TOKEN: (state, token) => {
       state.token = token
     },
     SET_USERNAME: (state, username) => {
       state.username = username
+    },
+    breadListStateAdd: (state, obj) => {
+      state.breadListState.push(obj)
+    },
+    breadListStateRemove: (state, num) => {
+      state.breadListState.splice(num, state.breadListState.length - num)
     }
   },
 

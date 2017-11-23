@@ -1,8 +1,8 @@
 import axios from 'axios'
 import { Message } from 'element-ui'
-import { getToken, getUsername } from '@/utils/auth'
+import { getToken, getUsername, removeToken } from '@/utils/auth'
 import VueRouter from 'vue-router'
-import store from '../store'
+// import store from '../store'
 import routes from '../router'
 
 const router = new VueRouter({
@@ -26,7 +26,6 @@ service.interceptors.request.use(config => {
   if (un) {
     config.headers['X-Un'] = un
   }
-
   return config
 }, error => {
   // Do something with request error
@@ -39,8 +38,12 @@ service.interceptors.response.use(
   response => {
     const res = response.data
     if (res.code === -1) {
-      store.dispatch('Logout').then(() => {
-        router.push({ path: '/login' })
+      removeToken()
+      router.push({path: '/login'})
+      Message({
+        message: '登录过期',
+        type: 'error',
+        duration: 3000
       })
     } else {
       return response

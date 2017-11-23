@@ -4,6 +4,7 @@ import Vue from 'vue'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 import CollapseTransition from 'element-ui/lib/transitions/collapse-transition'
+import echarts from 'echarts'
 import App from './App'
 import VueRouter from 'vue-router'
 import store from './store'
@@ -17,6 +18,7 @@ Vue.use(VueRouter)
 Vue.use(ElementUI)
 Vue.use(VueParticles)
 Vue.component(CollapseTransition.name, CollapseTransition)
+Vue.prototype.$echarts = echarts
 
 NProgress.configure({ showSpinner: true })
 
