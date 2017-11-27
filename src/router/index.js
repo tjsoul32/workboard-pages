@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 // import HelloWorld from '@/components/HelloWorld'
 import TaskList from '@/views/TaskList'
+import TaskStandalone from '@/views/TaskStandalone'
 import TaskAgg from '@/views/TaskAgg'
 import Login from '@/components/Login'
 import Index from '@/views/Index'
@@ -27,6 +28,12 @@ let routes = [
         path: '/tasklist',
         name: 'TaskList',
         component: TaskList
+      },
+      {
+        path: '/taskstandalone/:id',
+        name: 'TaskStandalone',
+        hidden: true,
+        component: TaskStandalone
       },
       {
         path: '/taskagg',

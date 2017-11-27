@@ -49,7 +49,7 @@
     </div>
 
     <div v-show="!isList">
-      <TaskDetail @previous="previous" @after="after" @backToList="back" :isList="isList" :taskidNow="taskidNow"></TaskDetail>
+      <TaskDetail @previous="previous" @after="after" @enterTask="enter" @backToList="back" :isList="isList" :taskidNow="taskidNow"></TaskDetail>
     </div>
   </div>
 </template>
@@ -120,7 +120,6 @@ export default {
       this.member = []
     },
     entertask: function (task) {
-      this.isList = false
       this.taskidNow = task.taskid
     },
     addtask: function () {
@@ -187,6 +186,9 @@ export default {
           }
         }
       }
+    },
+    enter: function () {
+      this.isList = false
     },
     back: function () {
       this.isList = true

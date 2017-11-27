@@ -3,6 +3,10 @@
     <button @click="previous"><=</button>
     <button @click="backToList">O</button>
     <button @click="after">=></button>
+    <div v-if="task.length !== 0">
+      <button @click="LinkShare">share</button>
+      <input id="url" type="text" readonly="readonly" :value="taskUrl"></input>
+    </div>
     <el-dialog title="member" :visible.sync="dialogFormVisible_member">
       <el-form>
 
@@ -83,6 +87,7 @@ import Comment from '@/components/Comment'
 import Items from '@/components/Items'
 import api from '@/api/api-workboard'
 import SearchUser from '@/components/SearchUser'
+import { Message } from 'element-ui'
 
 export default {
   name: 'TaskDetail',
@@ -100,6 +105,9 @@ export default {
   computed: {
     editor: function () {
       return this.task.operator && this.task.operator.indexOf(this.username) > -1 ? 1 : 0
+    },
+    taskUrl: function () {
+      return location.origin + '/#/taskstandalone/' + this.task.taskid
     }
   },
   components: {Comment, Items, SearchUser},
@@ -141,6 +149,14 @@ export default {
       api('/taskdetail/', 'get', params, function (res) {
         vue.task = res.data.task
         vue.commits = res.data.commits
+        vue.$emit('enterTask')
+        if (vue.task.length === 0) {
+          Message({
+            message: '不是该任务成员',
+            type: 'warning',
+            duration: 3000
+          })
+        }
       })
     },
     getTaskInfo: function () {
@@ -256,9 +272,22 @@ export default {
       this.$emit('after')
     },
     backToList: function () {
-      this.task = {}
-      this.commits = []
-      this.$emit('backToList')
+      if (this.task.length > 0) {
+        this.task = {}
+        this.commits = []
+        this.$emit('backToList')
+      }
+    },
+    LinkShare: function () {
+      var e = document.getElementById('url')
+      e.value = this.taskUrl
+      e.select()
+      document.execCommand('Copy')
+      Message({
+        message: '任务地址已复制',
+        type: 'info',
+        duration: 3000
+      })
     }
   },
   mounted () {
